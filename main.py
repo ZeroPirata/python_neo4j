@@ -74,6 +74,39 @@ class App:
             else:
                 session.execute_write(self._delete, findQuery)
 
+    def atualiazr(self):
+        with self.driver.session(database="neo4j") as session:
+            findQuery = input("Opção: ")
+            findQuery = findQuery.lower()
+            session.execute_write(self._atualizar, findQuery)
+
+    @staticmethod
+    def _atualizar(banco, tipo):
+        if tipo == 'pessoa' or tipo == 'vendedor':
+            alvo = input("Nome da pessoa/vendedor a ser atualizado: ")
+            print('Email | Nome | Idade')
+            item = input("Digite o item a atualizar: ")
+            novo_valor = input("Digite a nova informação: ")
+            objeto_atualizador = "p."+item
+            query = (
+                "MATCH (p:"+tipo+") "
+                "WHERE p.nome = $alvo "
+                "SET "+objeto_atualizador + " = $novo_valor"
+            )
+            banco.run(query, alvo=alvo, item=item, novo_valor=novo_valor)
+        if tipo == 'produto':
+            alvo = input("Nome do produto a ser atualizado: ")
+            print('Nome | Quantidade | Valor')
+            item = input("Digite o item a atualizar: ")
+            novo_valor = input("Digite a nova informação: ")
+            objeto_atualizador = "p."+item
+            query = (
+                "MATCH (p:"+tipo+") "
+                "WHERE p.nome = $alvo "
+                "SET "+objeto_atualizador + " = $novo_valor"
+            )
+            banco.run(query, alvo=alvo, item=item, novo_valor=novo_valor)
+
     @staticmethod
     def _delete(banco, tipo):
         alvo = input("Alvo a ser deletado: ")
@@ -219,7 +252,8 @@ if __name__ == "__main__":
         2 - Criar Relações
         3 - Queys
         4 - Deletar
-        5 / X - Sair
+        5 - Atualizar
+        6 / X - Sair
         """)
         escolha = input("Escolha: ")
         if escolha == '1':
@@ -230,6 +264,8 @@ if __name__ == "__main__":
             app.querys()
         if escolha == '4':
             app.delete()
-        if escolha == 'x' or escolha == '5':
+        if escolha == '5':
+            app.atualiazr()
+        if escolha == 'x' or escolha == '6':
             on = False
             app.close()
